@@ -14,7 +14,7 @@ project(':JoinYeldPriority') {
 }
 
 project(':BadBlock') {
-    apply plugin: 'java'
+
 }
 
 project(':exercise') {
