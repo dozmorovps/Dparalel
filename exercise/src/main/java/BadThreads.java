@@ -1,3 +1,6 @@
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 /*
  * Copyright (c) 1995, 2008, Oracle and/or its affiliates. All rights reserved.
  *
@@ -29,7 +32,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 public class BadThreads {
- 
+
+    /*
+    synchronized - синхронизация потоков не поможет остаться в живых поскольку не важно как оба потока выполняться и в итоге кого-то казнят
+    correctorThread.join(); работает. остались в живых. но ждем пока выполниться дочерняя нить.
+    Lock - не работает. оно и понятно: мы лочим переменную для записи в нити. но пишем в обоих потоках. его надо использовать в случае мат операций пожалуй
+    Thread.sleep(1000); до  correctorThread.start(); четко казнит ровно 1 раз.
+    Thread.sleep(1000); после  correctorThread.start(); уходит в бесконечный цикл, что интересно. при малых значениях сна все-таки казним
+    Thread.sleep(10) в нити тоже не дает эффекта и мы вновь казним
+
+    поменять между собой строки
+    correctorThread.start();
+    message = "Казнить";
+    данный способ не сработает точно поскольку мы все равно выполняем операцию присвоения в обоих потоках. правда в этом случае и join не поможет.
+
+    таким образом спастись можем только в том случае если дождемся пока дочерняя нить выполнится с помощью join.
+     */
+
     static String message;
 
     private static class CorrectorThread
@@ -41,14 +60,16 @@ public class BadThreads {
     }
  
     public static void main(String args[]) throws InterruptedException {
-
-        for (int i=0; i<10; i++) {
+        for (int i=0; i<10000; i++) {
             CorrectorThread correctorThread = new CorrectorThread();
+
             message = "Казнить";
             correctorThread.start();
-            Thread.sleep(10);
-//            if (message.equalsIgnoreCase("Казнить"))
-                System.out.println(message);
+            correctorThread.join(); // - РАБОТАЕТ, ЖИВЫ
+
+
+
+            if(message.equals("Казнить")) System.out.println("всё-таки казнить");
         }
     }
 }
