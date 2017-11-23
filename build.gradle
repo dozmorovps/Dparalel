@@ -1,0 +1,58 @@
+subprojects {
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+    ext {
+        jettyVersion = "9.4.1.v20170120"
+    }
+}
+
+// для Spring Boot
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.3.RELEASE")
+    }
+}
+
+project(':many-boot') {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+
+    dependencies {
+        compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+        compile("org.springframework.boot:spring-boot-devtools")
+        testCompile("org.springframework.boot:spring-boot-starter-test")
+        testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.22'
+    }
+
+    jar {
+        baseName = 'many-boot'
+        version =  '0.1.0'
+    }
+}
+
+project(':many-console') {
+    apply plugin: 'java'
+}
+
+project(':synchess') {
+    apply plugin: 'java'
+}
+
+project(':exchange') {
+    apply plugin: 'java'
+}
+
+project(':pool-future') {
+    apply plugin: 'java'
+}
+
+project(':exercise') {
+    apply plugin: 'java'
+}
